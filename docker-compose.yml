@@ -1,0 +1,40 @@
+
+version: '3'
+
+services:
+  anvil:
+    image: ghcr.io/foundry-rs/foundry
+    restart: unless-stopped
+    ports:
+      - "0.0.0.0:8545:8545"
+    volumes:
+      - ./foundry-data/:/home/foundry/.foundry
+    entrypoint: anvil --fork-url REPLACE_YOUR_HTTP_RPC_HOST -b 10 --host 0.0.0.0
+
+  nym2ethrpc:
+    build:
+      context: nym2ethrpc
+    environment:
+      NYM_CLIENT_ADDR: nym-client:1977
+      RPC_HOST: anvil:8545
+
+#  nym-client-tmp:
+#    build:
+#      context: ./nym-client
+#    restart: unless-stopped
+#    ports:
+#      - "127.0.0.1:1978:1977"
+#    environment:
+#      - LISTENING_ADDRESS=0.0.0.0
+  nym-client:
+    build:
+      context: ./nym-client
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1977:1977"
+    environment:
+      - LISTENING_ADDRESS=0.0.0.0
+    volumes:
+       - ./nym-client/nym-data/:/home/user/.nym/
+    depends_on:
+      - anvil
