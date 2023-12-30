@@ -11,6 +11,7 @@ rel = "*"
 requests = "*"
 py-cid = "*"
 dateparser = "*"
+web3 = "*"
 
 [dev-packages]
 
