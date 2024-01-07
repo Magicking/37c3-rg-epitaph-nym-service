@@ -56,11 +56,7 @@ class Serve:
         url = f"ws://{utils.NYM_CLIENT_ADDR}/"
         self.firstRun = True
         inputs = [['0x0000000000000000000000000000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000000000000000000000000000', '0x00000000000000000000000007000000000000000000000000000000f8000000', '0x0000000000000000000000078000000000000000000000000000003800000000', '0x0000000000000000000001c00000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000000000000000000000000000'], '0xa5c972', '']
-        try:
-            self.sendEpitaph(inputs)
-        except (ValueError, KeyError) as e:
-            self.error(recipient, message, received_message, e)
-            return
+        self.sendEpitaph(inputs)
         # START APPLICATION HERE
         #self.pasteNym = PasteNym()
 
@@ -146,13 +142,8 @@ class Serve:
                 print(f"-> Got {received_message}")
             else:
                 print(f"-> Got {event} from {recipient}")
-            try:
-                data = received_data
-                self.sendEpitaph(data)
-
-            except (ValueError, KeyError) as e:
-                self.error(recipient, message, received_message, e)
-                return
+            data = received_data
+            self.sendEpitaph(data)
         else:
             self.error(recipient, message, received_message, "received data is empty")
             return
@@ -324,7 +315,10 @@ class Serve:
             raw = True
             kS1 = received_message['message'].find('[')
             kS2 = received_message['message'].find(']')
-            transaction_inputs = json.loads(received_message['message'][kS1:kS2+20])
+            kS2 = received_message['message'].find(']', kS2+1)
+            toDecode = received_message['message'][kS1:kS2+1]
+            print(toDecode)
+            transaction_inputs = json.loads(toDecode)
 
             return transaction_inputs, raw
         except (JSONDecodeError, UnicodeDecodeError) as e:
